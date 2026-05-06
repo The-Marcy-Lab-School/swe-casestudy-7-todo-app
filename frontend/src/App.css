@@ -109,6 +109,7 @@ section {
 #add-todo-form label {
   font-size: 0.9rem;
   color: #374151;
+  display: none;
 }
 
 #add-todo-form input {
@@ -180,9 +181,5 @@ section {
   #add-todo-form {
     flex-direction: row;
     align-items: flex-end;
-  }
-
-  #add-todo-form label {
-    display: none;
   }
 }
