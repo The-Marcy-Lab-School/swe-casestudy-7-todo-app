@@ -54,6 +54,20 @@ user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 
 A user has many todos. Deleting a user cascades to delete all of their todos.
 
+## User Stories
+
+**Auth**
+- A user can register for an account with a username and password
+- A user can log in to an existing account
+- A user can log out
+- A returning user who has an active session is automatically logged in when they revisit the app
+
+**Todos**
+- A logged-in user can see all of their todos
+- A logged-in user can create a new todo by entering a title
+- A logged-in user can mark a todo as complete or incomplete
+- A logged-in user can delete a todo
+
 ## API Contract
 
 ### Auth endpoints
