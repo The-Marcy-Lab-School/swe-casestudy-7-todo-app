@@ -47,5 +47,5 @@ module.exports.getMe = async (req, res, next) => {
 
 module.exports.logout = (req, res) => {
   req.session = null;
-  res.sendStatus(204);
+  res.send({ message: 'Logged out.' });
 };
