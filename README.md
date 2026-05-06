@@ -8,13 +8,13 @@ A full-stack Todo app built with React, Express, and Postgres. Demonstrates sess
 swe-casestudy-7-todo-app/
 ├── frontend/               # React app (Vite)
 │   ├── src/
-│   │   ├── App.jsx         # Root component: all state, session rehydration, auth handlers
+│   │   ├── App.jsx         # Root component: currentUser state, session rehydration, auth handlers
 │   │   ├── adapters/
-│   │   │   ├── auth-adapters.js  # Fetch helpers for /api/auth/* endpoints
-│   │   │   └── todo-adapters.js  # Fetch helpers for /api/todos/* endpoints
+│   │   │   ├── auth-adapters.js  # Fetch adapters for /api/auth/* endpoints
+│   │   │   └── todo-adapters.js  # Fetch adapters for /api/todos/* endpoints
 │   │   └── components/
-│   │       ├── AuthForm.jsx    # Login + Register forms (shown when logged out)
-│   │       ├── TodoApp.jsx     # Main app container (shown when logged in)
+│   │       ├── AuthPage.jsx    # Login + Register forms (shown when logged out)
+│   │       ├── TodoPage.jsx    # Main app container (shown when logged in)
 │   │       ├── AddTodoForm.jsx # Form to create a new todo
 │   │       ├── TodoList.jsx    # Renders a list of TodoItems
 │   │       └── TodoItem.jsx    # Single todo: checkbox, title, delete button
@@ -34,6 +34,45 @@ swe-casestudy-7-todo-app/
         ├── pool.js         # Postgres connection pool
         └── seed.js         # Creates tables and inserts sample data
 ```
+
+## Schema
+
+```
+users
+─────────────────────────────
+user_id       SERIAL PRIMARY KEY
+username      TEXT UNIQUE NOT NULL
+password_hash TEXT NOT NULL
+
+todos
+─────────────────────────────
+todo_id     SERIAL PRIMARY KEY
+title       TEXT NOT NULL
+is_complete BOOLEAN DEFAULT FALSE
+user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+```
+
+A user has many todos. Deleting a user cascades to delete all of their todos.
+
+## API Contract
+
+### Auth endpoints
+
+| Method | Endpoint             | Request Body             | Response                          |
+| ------ | -------------------- | ------------------------ | --------------------------------- |
+| POST   | `/api/auth/register` | `{ username, password }` | `{ user_id, username }`           |
+| POST   | `/api/auth/login`    | `{ username, password }` | `{ user_id, username }`           |
+| DELETE | `/api/auth/logout`   | —                        | `{ message }`                     |
+| GET    | `/api/auth/me`       | —                        | `{ user_id, username }` or `null` |
+
+### Todo endpoints (all require authentication)
+
+| Method | Endpoint              | Request Body      | Response                                     |
+| ------ | --------------------- | ----------------- | -------------------------------------------- |
+| GET    | `/api/todos`          | —                 | `[{ todo_id, title, is_complete, user_id }]` |
+| POST   | `/api/todos`          | `{ title }`       | `{ todo_id, title, is_complete, user_id }`   |
+| PATCH  | `/api/todos/:todo_id` | `{ is_complete }` | `{ todo_id, title, is_complete, user_id }`   |
+| DELETE | `/api/todos/:todo_id` | —                 | `{ todo_id, title, is_complete, user_id }`   |
 
 ## Setup
 
@@ -87,15 +126,3 @@ After running `npm run db:seed`, these accounts are available:
 | -------- | ----------- |
 | alice    | password123 |
 | bob      | password123 |
-
-## Key Patterns
-
-| Pattern                       | Where                                                                                 |
-| ----------------------------- | ------------------------------------------------------------------------------------- |
-| `isLoading` / `error` state   | `App.jsx` + `TodoApp.jsx` — every fetch is tracked in state                           |
-| Session rehydration           | `App.jsx` — `useEffect(() => rehydrate(), [])` calls `GET /api/auth/me` on mount      |
-| Auth-dependent fetch          | `App.jsx` — `useEffect(() => loadTodos(), [currentUser])` refetches when user changes |
-| Props drilling                | `currentUser` and `onRefresh` passed from App → TodoApp → TodoList → TodoItem         |
-| Ternary conditional rendering | `App.jsx` — `currentUser ? <TodoApp> : <AuthForm>`                                    |
-| Short-circuit `&&`            | `TodoItem.jsx` — `currentUser && <button>Delete</button>`                             |
-| Adapter pattern               | `adapters/auth-adapters.js` / `adapters/todo-adapters.js` — one file per API domain   |
