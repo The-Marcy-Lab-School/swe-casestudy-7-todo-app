@@ -42,7 +42,7 @@ swe-casestudy-7-todo-app/
 Create a local Postgres database:
 
 ```sh
-createdb todo_app
+createdb todos_casestudy
 ```
 
 ### 2. Server
