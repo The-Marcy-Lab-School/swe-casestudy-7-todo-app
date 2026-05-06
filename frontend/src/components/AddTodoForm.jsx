@@ -1,6 +1,6 @@
 import { createTodo } from '../adapters/todo-adapters';
 
-function AddTodoForm({ onRefresh }) {
+function AddTodoForm({ loadTodos }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -10,7 +10,7 @@ function AddTodoForm({ onRefresh }) {
     const { error } = await createTodo(title);
     if (error) return console.error(error);
 
-    await onRefresh();
+    await loadTodos();
     form.reset();
   };
 

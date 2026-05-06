@@ -1,47 +1,24 @@
 import { useState, useEffect } from 'react';
 import { getMe, login, register, logout } from './adapters/auth-adapters';
-import { fetchAllTodos } from './adapters/todo-adapters';
-import AuthForm from './components/AuthForm';
-import TodoApp from './components/TodoApp';
+import AuthPage from './components/AuthPage';
+import TodoPage from './components/TodoPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [todos, setTodos] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // Session rehydration: restore the logged-in user from a server-side session
-  // cookie on every page load. React state doesn't survive a refresh; cookies do.
+  // On every page load, check the server for an active session cookie.
+  // React state doesn't survive a refresh; session cookies do.
   useEffect(() => {
-    const rehydrate = async () => {
+    const checkForSession = async () => {
       const { data: user } = await getMe();
       setCurrentUser(user);
     };
-    rehydrate();
+    checkForSession();
   }, []);
 
-  // Auth-dependent effect: fetch todos only after we know who is logged in.
-  // currentUser in the dependency array re-runs this effect on login and logout.
-  const loadTodos = async () => {
-    setIsLoading(true);
-    setError(null);
-    const { data, error: fetchError } = await fetchAllTodos();
-    if (fetchError) {
-      setError(fetchError.message);
-    } else {
-      setTodos(data);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (currentUser) {
-      loadTodos();
-    } else {
-      setTodos([]);
-    }
-  }, [currentUser]);
-
+  // Handlers that manage updating the current user. 
+  // Defined in App to ensure that child components only                       
+  // update the current user in a controlled manner.  
   const handleLogin = async (username, password) => {
     const { data: user, error } = await login(username, password);
     if (error) return error;
@@ -63,15 +40,8 @@ function App() {
     <main>
       <h1>Todo App</h1>
       {currentUser
-        ? <TodoApp
-            todos={todos}
-            currentUser={currentUser}
-            onLogout={handleLogout}
-            onRefresh={loadTodos}
-            isLoading={isLoading}
-            error={error}
-          />
-        : <AuthForm onLogin={handleLogin} onRegister={handleRegister} />
+        ? <TodoPage currentUser={currentUser} handleLogout={handleLogout} />
+        : <AuthPage handleLogin={handleLogin} handleRegister={handleRegister} />
       }
     </main>
   );

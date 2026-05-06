@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-function LoginForm({ onLogin }) {
+function LoginForm({ handleLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = await onLogin(username, password);
+    const error = await handleLogin(username, password);
     if (error) {
       setErrorMessage('Invalid username or password.');
     }
@@ -36,14 +36,14 @@ function LoginForm({ onLogin }) {
   );
 }
 
-function RegisterForm({ onRegister }) {
+function RegisterForm({ handleRegister }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = await onRegister(username, password);
+    const error = await handleRegister(username, password);
     if (error) {
       setErrorMessage('Could not register. Username may already be taken.');
     }
@@ -72,13 +72,13 @@ function RegisterForm({ onRegister }) {
   );
 }
 
-function AuthForm({ onLogin, onRegister }) {
+function AuthPage({ handleLogin, handleRegister }) {
   return (
     <div id="auth-section">
-      <LoginForm onLogin={onLogin} />
-      <RegisterForm onRegister={onRegister} />
+      <LoginForm handleLogin={handleLogin} />
+      <RegisterForm handleRegister={handleRegister} />
     </div>
   );
 }
 
-export default AuthForm;
+export default AuthPage;
