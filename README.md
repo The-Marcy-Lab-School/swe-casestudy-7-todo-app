@@ -90,12 +90,12 @@ After running `npm run db:seed`, these accounts are available:
 
 ## Key Patterns
 
-| Pattern                       | Where                                                                               |
-| ----------------------------- | ----------------------------------------------------------------------------------- |
-| Session rehydration           | `App.jsx` — `useEffect([], rehydrate)` calls `GET /api/auth/me` on mount            |
-| Auth-dependent fetch          | `App.jsx` — `useEffect([currentUser], loadTodos)` refetches when user changes       |
-| `isLoading` / `error` state   | `App.jsx` + `TodoApp.jsx` — every fetch is tracked in state                         |
-| Props drilling                | `currentUser` and `onRefresh` passed from App → TodoApp → TodoList → TodoItem       |
-| Ternary conditional rendering | `App.jsx` — `currentUser ? <TodoApp> : <AuthForm>`                                  |
-| Short-circuit `&&`            | `TodoItem.jsx` — `currentUser && <button>Delete</button>`                           |
-| Adapter pattern               | `adapters/auth-adapters.js` / `adapters/todo-adapters.js` — one file per API domain |
+| Pattern                       | Where                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| `isLoading` / `error` state   | `App.jsx` + `TodoApp.jsx` — every fetch is tracked in state                           |
+| Session rehydration           | `App.jsx` — `useEffect(() => rehydrate(), [])` calls `GET /api/auth/me` on mount      |
+| Auth-dependent fetch          | `App.jsx` — `useEffect(() => loadTodos(), [currentUser])` refetches when user changes |
+| Props drilling                | `currentUser` and `onRefresh` passed from App → TodoApp → TodoList → TodoItem         |
+| Ternary conditional rendering | `App.jsx` — `currentUser ? <TodoApp> : <AuthForm>`                                    |
+| Short-circuit `&&`            | `TodoItem.jsx` — `currentUser && <button>Delete</button>`                             |
+| Adapter pattern               | `adapters/auth-adapters.js` / `adapters/todo-adapters.js` — one file per API domain   |

@@ -11,13 +11,6 @@ const todoControllers = require('./controllers/todoControllers');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// In production, serve the built React app from frontend/dist.
-// In development, Vite's dev server handles the frontend on a separate port
-// and proxies /api requests to this server.
-const pathToFrontend = process.env.NODE_ENV === 'production'
-  ? '../frontend/dist'
-  : '../frontend';
-
 // ====================================
 // Middleware
 // ====================================
@@ -25,7 +18,11 @@ const pathToFrontend = process.env.NODE_ENV === 'production'
 app.use(logRoutes);
 app.use(cookieSession({ name: 'session', secret: process.env.SESSION_SECRET }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, pathToFrontend)));
+
+// In production, serve the built React app from frontend/dist.
+// In development, Vite's dev server handles the frontend on a separate port
+// and proxies /api requests to this server.
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // ====================================
 // Auth routes

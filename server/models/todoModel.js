@@ -30,6 +30,7 @@ module.exports.update = async (todo_id, { is_complete }) => {
 
 // Deletes a todo by id
 module.exports.destroy = async (todo_id) => {
-  const query = 'DELETE FROM todos WHERE todo_id = $1';
-  await pool.query(query, [todo_id]);
+  const query = 'DELETE FROM todos WHERE todo_id = $1 RETURNING *';
+  const { rows } = await pool.query(query, [todo_id]);
+  return rows[0] || null;
 };
